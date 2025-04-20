@@ -1,13 +1,32 @@
 # ルーティング設定用のクラス
 from fastapi import APIRouter
 
+# スキーマをimport
+import schemas.contact as contact_schema
+
+from datetime import datetime
+
 # インスタンス化
 router = APIRouter()
 
 # 一覧表示
-@router.get("/contacts") 
+# 第二引数にレスポンスのモデルを指定
+@router.get("/contacts", response_model=list[contact_schema.Contact])
 async def get_contact_all():
-    pass
+    
+    # 試しにデータを登録
+    dummy_date = datetime.now()
+
+    return [contact_schema.Contact(
+        id=1,
+        name="山田",
+        email="test@test.com",
+        url="http://test.com",
+        gender=1,
+        message="テスト",
+        is_enabled=False,
+        created_at=dummy_date
+        )]
 
 # 保存
 @router.post("/contacts")
