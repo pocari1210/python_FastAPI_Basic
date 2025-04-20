@@ -1,0 +1,36 @@
+
+1-インストールとルートディレクトリの表示
+
+下記コマンドで必要なライブラリをインストール
+
+pip install fastapi==0.110.0
+pip install "uvicorn[standard]"==0.27.1
+
+pip listコマンドを実行し、
+インストールの確認ができたらOK
+
+//////////////////////////////////////////////////////
+
+main.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+from fastapi import FastAPI
+
+# FastAPIのクラスを変数appにインスタンス化
+app = FastAPI()
+
+# URLを指定
+@app.get("/")
+
+# 「/」のURLにアクセスしたら、メソッドが実行される
+async def root():
+    return {"message": "Hello World"}
+
+★実行結果★
+下記コマンドを実行し、アクセスを行い、
+{"message": "Hello World"}が表示されたらOK
+
+コマンド
+uvicorn main:app --reload
+
