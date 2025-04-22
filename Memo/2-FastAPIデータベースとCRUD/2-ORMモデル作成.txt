@@ -1,0 +1,91 @@
+
+2-ORMモデル作成
+
+データベースに情報を保存できるように仕組みを作成する。
+
+パッケージ化の対応
+
+ディレクトリ
+\python_FastAPI_Basic\cmd\models\__init__.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+パッケージ化するため、中身は空にする
+
+//////////////////////////////////////////////////////////////////////////////
+
+テーブル作成
+
+ディレクトリ
+\python_FastAPI_Basic\cmd\models\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from database import Base
+from datetime import datetime
+
+"""
+Contactクラスの引数
+cmdフォルダ直下のdatabase.pyの変数Baseを引数としている
+
+この継承をすることで、データベースのテーブルを作成することができるああ
+
+"""
+class Contact(Base): # 継承
+    __tablename__ = "contacts" # テーブル名
+    id = Column(Integer, primary_key=True, autoincrement=True) # 主キー、自動インクリメント
+    name = Column(String(50), nullable=False)
+    email = Column(String(255), nullable=False)
+    url = Column(String(255), nullable=True)
+    gender = Column(Integer, nullable=False) # enumで設定するパターンもある
+    message = Column(String(200), nullable=False)
+    is_enabled = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.now())
+
+//////////////////////////////////////////////////////////////////////////////
+
+マイグレートを実行するファイルを作成
+作成したDB接続(ORM)モデルを元にDBテーブルを生成する
+
+ディレクトリ
+C:\python\python_FastAPI_Basic\cmd\migrate_db.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+from sqlalchemy.ext.asyncio import create_async_engine
+from models.contact import Base
+import asyncio
+
+DB_URL = "sqlite+aiosqlite:///fastapi-app.db"
+
+engine = create_async_engine(DB_URL, echo=True)
+
+async def reset_database():
+    async with engine.begin() as conn: # with 例外発生時でもリソース解放される
+        await conn.run_sync(Base.metadata.drop_all) # テーブル削除
+        await conn.run_sync(Base.metadata.create_all) # テーブル作成
+
+if __name__ == "__main__": # スクリプトで実行時のみ実行
+    asyncio.run(reset_database())
+
+
+★コード解説★
+マイグレーション・・・テーブルを作ったり削除したりして、その履歴を残すこと
+
+
+//////////////////////////////////////////////////////////////////////////////
+
+下記コマンドを実行し、作成したテーブルcontactsが表示されたらOK
+
+コマンド
+python migrate_db.py
+
+sqlite3 fastapi-app.db
+
+sqlite> .tables
+
+contacts
+
+コントロールCで抜ける
+
