@@ -1,0 +1,80 @@
+
+3-レスポンス
+
+◆スキーマの作成◆
+
+ディレクトリ
+\python_FastAPI_Basic\cmd\schemas\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+from pydantic import BaseModel, Field #インポート
+from datetime import datetime
+
+# pydanticのBaseModelを継承(引数として使う)
+class Contact(BaseModel): 
+    id: int
+    name: str
+    email: str
+    url: str
+    gender: int
+    message: str
+    is_enabled: bool
+    created_at: datetime
+
+★コード解説★
+テーブルのカラム名と型を指定している
+
+///////////////////////////////////////////////////////
+
+
+◆データの登録処理◆
+
+ディレクトリ
+python_FastAPI_Basic\cmd\routers\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+# スキーマをimport
+import schemas.contact as contact_schema
+
+from datetime import datetime
+
+# 一覧表示
+# 第二引数にレスポンスのモデルを指定
+@router.get("/contacts", response_model=list[contact_schema.Contact])
+async def get_contact_all():
+    
+    # 試しにデータを登録
+    dummy_date = datetime.now()
+    return [contact_schema.Contact(
+        id=1, 
+        name="山田", 
+        email="test@test.com",
+        url="http://test.com", 
+        gender=1, 
+        message="テスト", 
+        is_enabled=False,
+        created_at=dummy_date 
+        )]
+
+★コード解説★
+
+/contactのURLを開いたら、return内のデータが
+表示される
+
+response_model=list[contact_schema.Contact]
+⇒schemas\contact.pyのContactクラスをimportしている
+⇒schemasで記述したデータしか通信をおこなうことができない
+⇒listメソッドを使うことで、複数のデータを処理できる
+
+///////////////////////////////////////////////////////
+
+http://127.0.0.1:8000/docsを開き、
+try it outボタンを押し、executeする
+
+実行結果を確認し、
+データが表示されたらOK
+
+※型があっていなかった場合、Internal Server Errorが
+　表示される

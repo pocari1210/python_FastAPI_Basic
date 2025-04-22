@@ -1,0 +1,83 @@
+
+2-ルーティングの雛形作成
+
+◆パッケージ化の対応◆
+
+ディレクトリ
+python_FastAPI_Basic\cmd\routers
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+routersフォルダを作成し、
+__init__.pyファイルを作成し、
+パッケージ化させる
+
+※中身はかかない
+
+/////////////////////////////////////////////////////
+
+◆ルーティング譲歩の雛形作成◆
+
+ディレクトリ
+python_FastAPI_Basic\cmd\routers\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+# ルーティング設定用のクラス
+from fastapi import APIRouter
+
+# インスタンス化
+router = APIRouter()
+
+# 一覧表示
+@router.get("/contacts") 
+async def get_contact_all():
+    pass
+
+# 保存
+@router.post("/contacts")
+async def create_contact():
+    pass
+
+# 詳細表示
+@router.get("/contacts/{id}")
+async def get_contact():
+    pass
+
+# 更新
+@router.put("/contacts/{id}")
+async def update_contact():
+    pass
+
+# 削除
+@router.delete("/contacts/{id}")
+async def delete_contact():
+    pass
+
+/////////////////////////////////////////////////////
+
+◆パッケージをimportする◆
+
+ディレクトリ
+python_FastAPI_Basic\cmd\main.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+# パッケージ読込(routersフォルダ下のcontact.pyをimport)
+from routers import contact
+
+# パッケージ内のルーター(インスタンス)を読み込み
+app.include_router(contact.router)
+
+★コード解説★
+include_routerメソッドで、contactモジュールで
+APIRouterクラスをインスタンス化した変数のデータを
+読み込んでいる
+
+/////////////////////////////////////////////////////
+
+http://127.0.0.1:8000/docsを表示させ、
+疎通の確認ができたらOK
+
+
+

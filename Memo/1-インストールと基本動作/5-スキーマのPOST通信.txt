@@ -1,0 +1,40 @@
+
+5-スキーマのPOST通信
+
+◆ルーターの編集◆
+
+ディレクトリ
+\python_FastAPI_Basic\cmd\routers\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+# 保存
+@router.post("/contacts",response_model=contact_schema.Contact)
+async def create_contact(body: contact_schema.Contact):
+    return contact_schema.Contact(**body.model_dump())
+
+★コード解説★
+
+body: contact_schema.Contactの引数について
+・スキーマで指定した型を指定している
+
+**body.model_dump()の引数について、
+・Pydanticの機能で、keyとvalueを生成する。
+・アスタリスク二つ(**)は、可変長引数で辞書型として、
+　keyとvalueをを取得している
+
+//////////////////////////////////////////////////////////////
+
+下記コマンドを実行
+uvicorn main:app --reload
+
+下記URLへ遷移
+http://127.0.0.1:8000/docs
+
+POST通信の項目のtry it outボタンを押し、
+中身を編集
+
+Executeボタンを押し、ステータス200(成功)が表示されたら
+OK
+
+※バリデーションでNGだった場合、422エラーが表示される
