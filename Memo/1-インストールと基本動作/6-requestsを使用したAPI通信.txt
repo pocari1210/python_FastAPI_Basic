@@ -1,0 +1,53 @@
+
+6-requestsを使用したAPI通信
+
+下記のライブラリをインストール
+pip install requests
+
+テスト用ファイルの作成
+
+ディレクトリ
+\python_FastAPI_Basic\cmd\api_test.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+import requests
+import json
+from datetime import datetime
+
+def main():
+    url = "http://localhost:8000/contacts"
+    current_datetime = datetime.now().isoformat() # JSON変換できるようにISO形式に変換
+    body = {
+        "id": 1,
+        "name": "山田さん",
+        "email" : "test1@test.com",
+        "url" : "https://example.com",
+        "gender": 2,
+        "message" : "メッセージです",
+        "is_enabled" : True,
+        "created_at" : current_datetime 
+    }
+
+    res = requests.post(url, json.dumps(body))
+    print(res.json())
+
+# コマンドを実行した時のみ動かす
+if __name__ == "__main__":
+    main()
+
+
+★コード解説★
+
+requests.post(url, json.dumps(body))
+・第二引数のjson.dumps(body)は、
+　辞書型のままだと送信できないので、JSON形式に変換して
+　送信している
+
+//////////////////////////////////////////////////////////////
+
+下記コマンドを実行して、変数bodyの中身が
+実行結果で表示されたらOK
+
+コマンド
+python api_test.py
