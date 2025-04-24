@@ -1,0 +1,58 @@
+
+3-スキーマモデルの修正
+
+◆スキーマの編集◆
+
+ディレクトリ
+\python_FastAPI_Basic\cmd\schemas\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+class ContactList(BaseModel):
+    id: int
+    name: str = Field(..., min_length=2, max_length=50)
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class ContactBase(BaseModel):
+    name: str = Field(..., min_length=2, max_length=50)
+    email: EmailStr
+    url: HttpUrl | None = Field(default=None)
+    gender: int = Field(..., strict=True, ge=0, le=2)
+    message: str = Field(..., max_length=200)
+    is_enabled: bool = Field(default=False)
+    class Config: # ORMと紐づけを行う
+        from_attributes = True
+
+class ContactDetail(ContactBase):
+    id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class ContactCreate(ContactBase):
+    pass
+
+★コード解説★
+ベースとなるContactBaseクラスは、IDは登録されたら自動で
+インクリメントでIDが付与され、登録時刻は登録のあった日時が
+自動で書かれるため、テーブルに含めなくてよい
+
+ContactDetailクラスとContactCreateクラスは、親クラスのContactBaseを
+継承している。
+
+ex:ContactDetailクラスは、親クラスのContactBaseの登録内容をひきついでいるので、
+   idと登録情報のテーブルを記述すれば、すべての内容を表示できる
+
+ORMモデルとは?
+データベースに保存するときに使用されるもの
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
