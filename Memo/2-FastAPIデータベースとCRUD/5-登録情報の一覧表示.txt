@@ -1,0 +1,65 @@
+
+5-登録情報の一覧表示
+
+登録されたデータの一覧表示の記述
+
+ディレクトリ
+python_FastAPI_Basic\cmd\cruds\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・」
+
+from typing import List, Tuple
+from sqlalchemy import select
+from sqlalchemy.engine import Result
+from datetime import datetime
+
+"""
+一覧表示
+id,name,createdのカラムを指定し、
+uvicornに疎通させる
+
+"""
+
+async def get_contact_all(db: AsyncSession) -> List[Tuple[int, str, datetime]]:
+
+    # DBのexecuteの結果が変数resultにはいる
+    result : Result = await db.execute(
+
+        # selectメソッドで取得するカラムを指定
+        select(
+            contact_model.Contact.id,
+            contact_model.Contact.name,
+            contact_model.Contact.created_at
+        )
+    )
+    return result.all()
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ルーターの編集
+
+ディレクトリ
+\python_FastAPI_Basic\cmd\routers\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+# 一覧表示
+# 第二引数にレスポンスのモデルを指定
+@router.get("/contacts", response_model=list[contact_schema.ContactList]) 
+
+# AsyncSessionでデータベースに接続
+async def get_contact_all(db: AsyncSession = Depends(get_db)):
+    return await contact_crud.get_contact_all(db)
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+下記コマンドを実行
+uvicorn main:app --reload
+
+http://127.0.0.1:8000/docs/を検索し、
+Get Contact Allの箇所を選択し、try it outボタンを押す
+
+登録された内容が全件表示できていたらOK
+

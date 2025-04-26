@@ -1,6 +1,10 @@
+from typing import List, Tuple
+from sqlalchemy import select
+from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 import schemas.contact as contact_schema
 import models.contact as contact_model
+from datetime import datetime
 
 async def create_contact(db: AsyncSession, contact: contact_schema.ContactCreate ) -> contact_model.Contact:
     
@@ -36,3 +40,24 @@ async def create_contact(db: AsyncSession, contact: contact_schema.ContactCreate
 
     # 関数の戻り値を指定
     return db_contact
+
+"""
+一覧表示
+id,name,createdのカラムを指定し、
+uvicornに疎通させる
+
+"""
+
+async def get_contact_all(db: AsyncSession) -> List[Tuple[int, str, datetime]]:
+
+    # DBのexecuteの結果が変数resultにはいる
+    result : Result = await db.execute(
+
+        # selectメソッドで取得するカラムを指定
+        select(
+            contact_model.Contact.id,
+            contact_model.Contact.name,
+            contact_model.Contact.created_at
+        )
+    )
+    return result.all()

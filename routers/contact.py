@@ -13,23 +13,12 @@ router = APIRouter()
 
 # 一覧表示
 # 第二引数にレスポンスのモデルを指定
-@router.get("/contacts", response_model=list[contact_schema.ContactList])
-async def get_contact_all():
+@router.get("/contacts", response_model=list[contact_schema.ContactList]) 
+
+# AsyncSessionでデータベースに接続
+async def get_contact_all(db: AsyncSession = Depends(get_db)):
+    return await contact_crud.get_contact_all(db)
     
-    # 試しにデータを登録
-    dummy_date = datetime.now()
-
-    return [contact_schema.Contact(
-        id=1,
-        name="山田",
-        email="test@test.com",
-        url="http://test.com",
-        gender=1,
-        message="テスト",
-        is_enabled=False,
-        created_at=dummy_date
-        )]
-
 # 保存
 @router.post("/contacts",response_model=contact_schema.ContactCreate)
 async def create_contact(body: contact_schema.ContactCreate, db: AsyncSession = Depends(get_db)):
