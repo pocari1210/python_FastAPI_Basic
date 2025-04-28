@@ -61,3 +61,16 @@ async def get_contact_all(db: AsyncSession) -> List[Tuple[int, str, datetime]]:
         )
     )
     return result.all()
+
+"""
+詳細一覧表示
+idを指定し、1件だけ表示させる
+
+"""
+
+async def get_contact(db: AsyncSession, id: int) -> contact_model.Contact | None:
+    query = select(contact_model.Contact).where(contact_model.Contact.id == id)
+    result : Result = await db.execute(query)
+
+    # 1件目のデータを取得する
+    return result.scalars().first()

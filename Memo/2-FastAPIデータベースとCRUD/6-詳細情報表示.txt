@@ -1,0 +1,54 @@
+
+6-詳細情報表示
+
+id情報を指定して、1件だけ表示させる
+
+詳細情報表示の記述
+
+ディレクトリ
+python_FastAPI_Basic\cmd\cruds\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+"""
+詳細一覧表示
+idを指定し、1件だけ表示させる
+
+"""
+
+async def get_contact(db: AsyncSession, id: int) -> contact_model.Contact | None:
+    query = select(contact_model.Contact).where(contact_model.Contact.id == id)
+    result : Result = await db.execute(query)
+
+    # 1件目のデータを取得する
+    return result.scalars().first()
+
+★コード詳細★
+
+->の記号は、戻り値へ返すという意味。
+returnと同義
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+ルーターの編集
+
+ディレクトリ
+\python_FastAPI_Basic\cmd\routers\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+# 詳細表示
+@router.get("/contacts/{id}", response_model=contact_schema.ContactDetail) 
+async def get_contact(id: int, db: AsyncSession = Depends(get_db)):
+    contact = await contact_crud.get_contact(db, id)
+
+    # 登録していないidを選択した時の処理
+    if contact is None:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    return contact
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
