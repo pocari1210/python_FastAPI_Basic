@@ -35,7 +35,7 @@ async def create_contact(db: AsyncSession, contact: contact_schema.ContactCreate
     # ※非同期関数で処理をおこなっているため、awaitを記述するのがベター
     await db.commit() 
 
-    # DBに登録されあ最新の情報を反映させる
+    # DBに登録された最新の情報を反映させる
     await db.refresh(db_contact)
 
     # 関数の戻り値を指定
@@ -74,3 +74,26 @@ async def get_contact(db: AsyncSession, id: int) -> contact_model.Contact | None
 
     # 1件目のデータを取得する
     return result.scalars().first()
+
+"""
+更新処理
+idを指定し登録している情報を変更する
+
+"""
+
+async def update_contact(
+        db: AsyncSession, 
+        contact: contact_schema.ContactCreate, # 更新したい情報
+        original: contact_model.Contact # 登録済みの情報
+        ) -> contact_model.Contact:
+    original.name = contact.name
+    original.email = contact.email
+    if original.url is not None:
+        original.url = str(contact.url)
+    original.gender = contact.gender
+    original.message = contact.message
+    db.add(original) # 追加
+    await db.commit() # コミット (反映)
+    await db.refresh(original) # # DBに登録された最新の情報を反映させる
+    return original
+

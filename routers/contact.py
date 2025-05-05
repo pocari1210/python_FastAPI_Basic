@@ -34,10 +34,16 @@ async def get_contact(id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Contact not found")
     return contact
 
-# 更新
-@router.put("/contacts/{id}", response_model=contact_schema.ContactCreate)
-async def update_contact(id: int, body: contact_schema.ContactCreate):
-    return contact_schema.Contact(id, **body.model_dump())
+# 更新処理
+@router.put("/contacts/{id}", response_model=contact_schema.ContactCreate) # 更新
+async def update_contact(id: int, body: contact_schema.ContactCreate, db: AsyncSession = Depends(get_db)):
+    contact = await contact_crud.get_contact(db, id)
+
+    # DBに登録されているIDかチェックを行う
+    # IDが登録されていなかった場合、例外処理で404エラーを出力する
+    if contact is None:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    return await contact_crud.update_contact(db, body, original=contact)
 
 # 削除
 # idを指定すればモデルは不要の為、response_modelをNoneとする

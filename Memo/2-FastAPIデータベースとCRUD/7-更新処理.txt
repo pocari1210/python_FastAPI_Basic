@@ -1,0 +1,57 @@
+
+7-更新処理
+
+更新処理の記述
+
+ディレクトリ
+python_FastAPI_Basic\cmd\cruds\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+"""
+更新処理
+idを指定し登録している情報を変更する
+
+"""
+
+async def update_contact(
+        db: AsyncSession, 
+        contact: contact_schema.ContactCreate, # 更新したい情報
+        original: contact_model.Contact # 登録済みの情報
+        ) -> contact_model.Contact:
+    original.name = contact.name
+    original.email = contact.email
+    if original.url is not None:
+        original.url = str(contact.url)
+    original.gender = contact.gender
+    original.message = contact.message
+    db.add(original) # 追加
+    await db.commit() # コミット (反映)
+    await db.refresh(original)  # DBに登録された最新の情報を反映させる
+    return original
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+ルーターの編集
+
+ディレクトリ
+\python_FastAPI_Basic\cmd\routers\contact.py
+
+・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
+
+# 更新処理
+@router.put("/contacts/{id}", response_model=contact_schema.ContactCreate) # 更新
+async def update_contact(id: int, body: contact_schema.ContactCreate, db: AsyncSession = Depends(get_db)):
+    contact = await contact_crud.get_contact(db, id)
+    if contact is None:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    return await contact_crud.update_contact(db, body, original=contact)
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+下記コマンドを実行
+uvicorn main:app --reload
+
+http://127.0.0.1:8000/docsのURLを開き、
+putの項目で、name情報を書き換え、
+executeを実行後、ステータスコードが200と表示されたらOK
